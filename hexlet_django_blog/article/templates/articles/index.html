@@ -2,7 +2,7 @@
 
 {% block content %}
 {% include 'articles/errors.html' %}
-
+{% include 'articles/messages.html' %}
   <h1>Список статей</h1>
   <a href="{% url 'articles_create' %}">Create article</a>
   {% for article in articles %}

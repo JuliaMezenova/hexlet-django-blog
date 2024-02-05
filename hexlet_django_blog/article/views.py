@@ -1,12 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-# from django.http import HttpResponse
-# Create your views here.
-
-#def index(request):
-#    return render(request, 'articles/index.html', context={'name': 'Article'})
-
-#from django.http import HttpResponse
 from django.views import View
+from django.contrib import messages
 
 from hexlet_django_blog.article.models import Article
 from hexlet_django_blog.article.forms import ArticleForm
@@ -14,7 +8,7 @@ from hexlet_django_blog.article.forms import ArticleForm
   
 class IndexView(View):
        
-    def get(self, request, *args, **kwargs): # tags:str, article_id:int):
+    def get(self, request, *args, **kwargs):
         articles = Article.objects.all()[:15]
         return render(request, 'articles/index.html', context={
             'articles': articles,
@@ -39,9 +33,11 @@ class ArticleFormCreateView(View):
     def post(self, request, *args, **kwargs):
         form = ArticleForm(request.POST)
         if form.is_valid(): # Если данные корректные, то сохраняем данные формы
+            messages.success(request, "Article created successfully!")
             form.save()
             return redirect('articles') # Редирект на указанный маршрут
         # Если данные некорректные, то возвращаем человека обратно на страницу с заполненной формой
+        messages.error(request, "It didn't create!")
         return render(request, 'articles/create.html', {'form': form})
 
 
@@ -58,9 +54,10 @@ class ArticleFormEditView(View):
         article = Article.objects.get(id=article_id)
         form = ArticleForm(request.POST, instance=article)
         if form.is_valid():
+            messages.success(request, "Article updated successfully!")
             form.save()
             return redirect('articles')
-
+        messages.error(request, "It didn't update!")
         return render(request, 'articles/update.html', {'form': form, 'article_id':article_id})
 
 
@@ -70,5 +67,7 @@ class ArticleFormDeleteView(View):
         article_id = kwargs.get('id')
         article = Article.objects.get(id=article_id)
         if article:
+            messages.success(request, "Article deleted successfully!")
             article.delete()
+        
         return redirect('articles')
